@@ -33,16 +33,15 @@ class Graph:
 
 def ucs(G, v):
     visited = set()  # set of visited nodes
-    q = queue.PriorityQueue()  # we store vertices in the (priority) queue as tuples
-    # (f, n, path), with
-    # f: the cumulative cost,
+    fringe = queue.PriorityQueue()
+    # (cost, n, path)
+    # cost: the cumulative cost,
     # n: the current node,
     # path: the path that led to the expansion of the current node
-    q.put((0, v, [v]))  # add the starting node, this has zero *cumulative* cost
-    # and it's path contains only itself.
+    fringe.put((0, v, [v]))
 
-    while not q.empty():  # while the queue is nonempty
-        f, current_node, path = q.get()
+    while not fringe.empty():  # while the queue is not nempty
+        cost, current_node, path = fringe.get()
         visited.add(current_node)  # mark node visited on expansion,
         # only now we know we are on the cheapest path to
         # the current node.
@@ -53,4 +52,4 @@ def ucs(G, v):
             for edge in current_node.out_edges:
                 child = edge.to()
                 if child not in visited:
-                    q.put((f + edge.weight, child, path + [child]))
+                    fringe.put((cost + edge.weight, child, path + [child]))
