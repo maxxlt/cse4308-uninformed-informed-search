@@ -1,9 +1,10 @@
-import queue
-
 
 # Referenced from: https://stackoverflow.com/questions/43354715/uniform-cost-search-in-python
+# to implement node and edges to the node
+
 # Node data structure
 class Node:
+
     def __init__(self, label):
         self.out_edges = []
         self.label = label
@@ -15,6 +16,7 @@ class Node:
 
 # Edge data structure
 class Edge:
+
     def __init__(self, node, weight=0):
         self.node = node
         self.weight = weight
@@ -23,33 +25,42 @@ class Edge:
         return self.node
 
 
-# Graph data structure, utilises classes Node and Edge
 class Graph:
+
     def __init__(self):
         self.nodes = []
 
-    # some other functions here populate the graph, and randomly select three goal nodes.
+    def contains(self, label):
+        for node in self.nodes:
+            if node.label == label:
+                return True
+        return False
 
+    # this function checks whether or not the node exists in the `self.nodes`,
+    # if it is, return the address of that node,
+    # otherwise return new Node() object with given label
+    # Side note: this function prevents from adding existing node in `self.nodes`
+    def node(self, label):
+        for node in self.nodes:
+            if node.label == label:
+                return node
+        return Node(label)
 
-def ucs(G, v):
-    visited = set()  # set of visited nodes
-    fringe = queue.PriorityQueue()
-    # (cost, n, path)
-    # cost: the cumulative cost,
-    # n: the current node,
-    # path: the path that led to the expansion of the current node
-    fringe.put((0, v, [v]))
+    # this function adds a new node with given information passed as arguments
+    def add_new_node(self, origin_label, destination_label, cost, is_goal):
+        node = self.node(origin_label)
+        node.is_goal = is_goal  # reassigning is_goal, better solution?
+        node.add_edge(self.node(destination_label), int(cost))
+        if (node not in self.nodes):  # if node node not in `self.nodes`, we add that node in
+            self.nodes.append(node)
+        if (self.node(destination_label) not in self.nodes):
+            self.nodes.append(self.node(destination_label))
 
-    while not fringe.empty():  # while the queue is not nempty
-        cost, current_node, path = fringe.get()
-        visited.add(current_node)  # mark node visited on expansion,
-        # only now we know we are on the cheapest path to
-        # the current node.
-
-        if current_node.is_goal:  # if the current node is a goal
-            return path  # return its path
-        else:
-            for edge in current_node.out_edges:
-                child = edge.to()
-                if child not in visited:
-                    fringe.put((cost + edge.weight, child, path + [child]))
+    # this function prints graph
+    def print_graph(self):
+        for node in self.nodes:
+            out_edges_labels = []
+            for edge in node.out_edges:
+                out_edges_labels.append({edge.to(), edge.weight})
+            print("Origin: " + node.label + " | {Weight, Destination}: " + str(out_edges_labels) +
+                  " | is_goal? " + str(node.is_goal))
