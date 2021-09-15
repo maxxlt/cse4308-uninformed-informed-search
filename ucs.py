@@ -50,11 +50,13 @@ class Graph:
     def add_new_node(self, origin_label, destination_label, cost, is_goal):
         node = self.node(origin_label)
         node.is_goal = is_goal  # reassigning is_goal, better solution?
-        node.add_edge(self.node(destination_label), int(cost))
+        node.add_edge(self.node(destination_label), float(cost))
         if (node not in self.nodes):  # if node node not in `self.nodes`, we add that node in
             self.nodes.append(node)
         if (self.node(destination_label) not in self.nodes):
             self.nodes.append(self.node(destination_label))
+        if (node not in self.node(destination_label).out_edges):
+            self.node(destination_label).add_edge(node, float(cost))
 
     # this function prints graph
     def print_graph(self):
