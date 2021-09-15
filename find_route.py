@@ -1,7 +1,7 @@
 import sys
 import queue
 from file_operation import *
-from ucs import *
+from graph import *
 
 # [DEBUG]
 # print("Number of arguments: " + str(len(sys.argv)) + " arguments.")
@@ -10,7 +10,39 @@ from ucs import *
 nodes_generated = 0
 
 
-def graph_search(G, initial_node):
+def uninformed_search(G, initial_node):
+    nodes_popped = 0
+    nodes_expanded = 0
+    nodes_generated = 0
+    closed = set()  # set of visited nodes
+    fringe = queue.PriorityQueue()
+    # (cost, node, path)
+    # cost: the cumulative cost,
+    # node: the current node,
+    # path: the path that led to the expansion of the current node
+
+    # insert initial node into the fringe
+    fringe.put((0, initial_node, [(initial_node, 0)]))
+
+    while not fringe.empty():
+        cost, node, path = fringe.get()  # remove the front of the fringe
+        nodes_popped += 1
+        closed.add(node)
+        if node.is_goal:  # goal-test
+            return (cost, path, nodes_popped, nodes_expanded, nodes_generated)
+        else:  # else we add node's child into the PriorityQueue
+            nodes_expanded += 1
+            for edge in node.out_edges:
+                child = edge.to()  # reference to nodes child
+                if child not in closed:
+                    nodes_generated += 1
+                    fringe.put(
+                        (cost + edge.weight, G.node(child.label), path + [(child, edge.weight)]))
+    # if the loop exited, means we didn't find any path to destination
+    return (0, [], nodes_popped, nodes_expanded, nodes_generated)
+
+
+def informed_search(G, initial_node):
     nodes_popped = 0
     nodes_expanded = 0
     nodes_generated = 0
@@ -64,9 +96,9 @@ def print_path(result_path):
         previous_node = node
 
 
-parsed_file = parse_file(sys.argv[1])
+parsed_file = parse_input_file(sys.argv[1])
 g = populate_graph(parsed_file, sys.argv[3])
-result_path = graph_search(g, g.node(sys.argv[2]))
+result_path = uninformed_search(g, g.node(sys.argv[2]))
 print("Nodes Popped: " + str(result_path[2]))
 print("Nodes Expanded: " + str(result_path[3]))
 print("Nodes Generated: " + str(result_path[4]))

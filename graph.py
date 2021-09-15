@@ -9,9 +9,13 @@ class Node:
         self.out_edges = []
         self.label = label
         self.is_goal = False
+        self.heuristic_value = -1
 
     def add_edge(self, node, weight=0):
         self.out_edges.append(Edge(node, weight))
+
+    def modify_heuristic_value(self, heuristic_value):
+        self.heuristic_value = float(heuristic_value)
 
 
 # Edge data structure

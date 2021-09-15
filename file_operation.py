@@ -1,4 +1,4 @@
-def print_file(filename):
+def print_input_file(filename):
     input_file = open(filename, 'r')
     lines = input_file.readlines()
     count = 0
@@ -9,7 +9,7 @@ def print_file(filename):
 
 
 # This function returns an array of [origin_label, destination_label, cost]
-def parse_file(filename):
+def parse_input_file(filename):
     result = []
     input_file = open(filename, 'r')
     lines = input_file.readlines()
