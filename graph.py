@@ -69,4 +69,4 @@ class Graph:
             for edge in node.out_edges:
                 out_edges_labels.append({edge.to(), edge.weight})
             print("Origin: " + node.label + " | {Weight, Destination}: " + str(out_edges_labels) +
-                  " | is_goal? " + str(node.is_goal))
+                  " | is_goal? " + str(node.is_goal) + " | heuristic_value: " + str(node.heuristic_value))

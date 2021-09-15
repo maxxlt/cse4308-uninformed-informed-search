@@ -69,7 +69,7 @@ def informed_search(G, initial_node):
                 if child not in closed:
                     nodes_generated += 1
                     fringe.put(
-                        (cost + edge.weight, G.node(child.label), path + [(child, edge.weight)]))
+                        (cost + edge.weight+child.heuristic_value, G.node(child.label), path + [(child, edge.weight)]))
     # if the loop exited, means we didn't find any path to destination
     return (0, [], nodes_popped, nodes_expanded, nodes_generated)
 
@@ -83,27 +83,45 @@ def populate_graph(parsed_file, goal_label):
     return g
 
 
+def add_heuristic_value(G, parsed_file):
+    for node in parsed_file:
+        for iterated in G.nodes:
+            if iterated.label == node[0]:
+                iterated.modify_heuristic_value(node[1])
+
+
 def print_path(result_path):
-    print("Route:")
     if result_path:
         previous_node = result_path[0]
     else:
+        print("Distance: Infinity")
+        print("Route:")
         print("None")
         return
+    total_cost = 0
     for node in result_path[1:]:
         print(previous_node[0].label + " to " +
               node[0].label + ", " + str(node[1]) + " km")
         previous_node = node
+        total_cost += node[1]
+    print("Distance: " + str(total_cost) + " km")
 
 
-parsed_file = parse_input_file(sys.argv[1])
+parsed_file = parse_file(sys.argv[1])
 g = populate_graph(parsed_file, sys.argv[3])
-result_path = uninformed_search(g, g.node(sys.argv[2]))
-print("Nodes Popped: " + str(result_path[2]))
-print("Nodes Expanded: " + str(result_path[3]))
-print("Nodes Generated: " + str(result_path[4]))
-if not result_path[0] == 0:
-    print("Distance: " + str(result_path[0]) + " km")
+
+if len(sys.argv) > 4:
+    parsed_heuristic_file = parse_file(sys.argv[4])
+    print(parsed_heuristic_file)
+    add_heuristic_value(g, parsed_heuristic_file)
+    result_path = informed_search(g, g.node(sys.argv[2]))
+    print("Nodes Popped: " + str(result_path[2]))
+    print("Nodes Expanded: " + str(result_path[3]))
+    print("Nodes Generated: " + str(result_path[4]))
+    print_path(result_path[1])
 else:
-    print("Distance: Infinity")
-print_path(result_path[1])
+    result_path = uninformed_search(g, g.node(sys.argv[2]))
+    print("Nodes Popped: " + str(result_path[2]))
+    print("Nodes Expanded: " + str(result_path[3]))
+    print("Nodes Generated: " + str(result_path[4]))
+    print_path(result_path[1])
