@@ -112,7 +112,6 @@ g = populate_graph(parsed_file, sys.argv[3])
 
 if len(sys.argv) > 4:
     parsed_heuristic_file = parse_file(sys.argv[4])
-    print(parsed_heuristic_file)
     add_heuristic_value(g, parsed_heuristic_file)
     result_path = informed_search(g, g.node(sys.argv[2]))
     print("Nodes Popped: " + str(result_path[2]))
