@@ -7,9 +7,8 @@ from graph import *
 # print("Number of arguments: " + str(len(sys.argv)) + " arguments.")
 # print("Argument List: " + str(sys.argv) + "\n")
 
-nodes_generated = 0
-
-
+# This uninformed search algorithm uses uniform-cost search
+# to find optimal solution within the given graph from initial_node
 def uninformed_search(G, initial_node):
     nodes_popped = 0
     nodes_expanded = 0
@@ -47,6 +46,8 @@ def uninformed_search(G, initial_node):
     return (0, [], nodes_popped, nodes_expanded, nodes_generated)
 
 
+# This informed search algorithm uses A* search
+# to find optimal solution within the given graph from initial_node
 def informed_search(G, initial_node):
     nodes_popped = 0
     nodes_expanded = 0
