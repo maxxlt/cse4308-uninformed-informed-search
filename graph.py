@@ -1,6 +1,3 @@
-# Referenced from: https://stackoverflow.com/questions/43354715/uniform-cost-search-in-python
-# to implement node and edges to the node
-
 # Node data structure
 class Node:
     def __init__(self, label):
