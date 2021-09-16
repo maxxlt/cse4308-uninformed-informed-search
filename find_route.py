@@ -13,7 +13,7 @@ nodes_generated = 0
 def uninformed_search(G, initial_node):
     nodes_popped = 0
     nodes_expanded = 0
-    nodes_generated = 0
+    nodes_generated = 1  # 1 because of the initial node that we generated manually
     closed = set()  # set of visited nodes
     fringe = queue.PriorityQueue()
     # (cost, node, path)
@@ -27,17 +27,22 @@ def uninformed_search(G, initial_node):
     while not fringe.empty():
         cost, node, path = fringe.get()  # remove the front of the fringe
         nodes_popped += 1
-        closed.add(node)
-        if node.is_goal:  # goal-test
-            return (cost, path, nodes_popped, nodes_expanded, nodes_generated)
-        else:  # else we add node's child into the PriorityQueue
-            nodes_expanded += 1
-            for edge in node.out_edges:
-                child = edge.to()  # reference to nodes child
-                if child not in closed:
+        if node not in closed:
+            closed.add(node)
+            if node.is_goal:  # goal-test
+                return (cost, path, nodes_popped, nodes_expanded, nodes_generated)
+            else:  # else we add node's child into the PriorityQueue
+                nodes_expanded += 1
+                for edge in node.out_edges:
                     nodes_generated += 1
+                    child = edge.to()  # reference to nodes child
                     fringe.put(
-                        (cost + edge.weight, G.node(child.label), path + [(child, edge.weight)]))
+                        (
+                            cost + edge.weight,
+                            G.node(child.label),
+                            path + [(child, edge.weight)],
+                        )
+                    )
     # if the loop exited, means we didn't find any path to destination
     return (0, [], nodes_popped, nodes_expanded, nodes_generated)
 
@@ -45,7 +50,7 @@ def uninformed_search(G, initial_node):
 def informed_search(G, initial_node):
     nodes_popped = 0
     nodes_expanded = 0
-    nodes_generated = 0
+    nodes_generated = 1  # 1 because of the initial node that we generated manually
     closed = set()  # set of visited nodes
     fringe = queue.PriorityQueue()
     # (cost, node, path)
@@ -59,17 +64,26 @@ def informed_search(G, initial_node):
     while not fringe.empty():
         cost, node, path = fringe.get()  # remove the front of the fringe
         nodes_popped += 1
-        closed.add(node)
-        if node.is_goal:  # goal-test
-            return (cost, path, nodes_popped, nodes_expanded, nodes_generated)
-        else:  # else we add node's child into the PriorityQueue
-            nodes_expanded += 1
-            for edge in node.out_edges:
-                child = edge.to()  # reference to nodes child
-                if child not in closed:
+        if node not in closed:
+            closed.add(node)
+            if node.is_goal:  # goal-test
+                return (cost, path, nodes_popped, nodes_expanded, nodes_generated)
+            else:  # else we add node's child into the PriorityQueue
+                nodes_expanded += 1
+                local_fringe = queue.PriorityQueue()
+                for edge in node.out_edges:
                     nodes_generated += 1
-                    fringe.put(
-                        (cost + edge.weight+child.heuristic_value, G.node(child.label), path + [(child, edge.weight)]))
+                    child = edge.to()  # reference to nodes child
+                    local_fringe.put(
+                        (
+                            cost + edge.weight + child.heuristic_value,
+                            G.node(child.label),
+                            path + [(child, edge.weight)],
+                        )
+                    )
+                fringe.put(
+                    local_fringe.get()
+                )  # we are only putting the smallest path out of all the local_fringe in the global fringe
     # if the loop exited, means we didn't find any path to destination
     return (0, [], nodes_popped, nodes_expanded, nodes_generated)
 
@@ -100,8 +114,14 @@ def print_path(result_path):
         return
     total_cost = 0
     for node in result_path[1:]:
-        print(previous_node[0].label + " to " +
-              node[0].label + ", " + str(node[1]) + " km")
+        print(
+            previous_node[0].label
+            + " to "
+            + node[0].label
+            + ", "
+            + str(node[1])
+            + " km"
+        )
         previous_node = node
         total_cost += node[1]
     print("Distance: " + str(total_cost) + " km")
